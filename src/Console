@@ -1,0 +1,135 @@
+--Вывести всех клиентов из страны Canada
+select *
+from customer
+where country = 'Canada';
+--Вывести все страны клиентов
+select distinct country
+from customer;
+--Вывести количество всех заказов
+select count(id)
+from orders;
+--Вывести максимальную стоимость заказа
+select max(total_amount)
+from orders;
+--Найти сумму всех заказов
+select sum(total_amount)
+from orders;
+--- Найти сумму всех заказов за 2014 год
+select sum(total_amount)
+from orders
+where order_date between '2014-01-01' and '2014-12-31';
+--- Найти среднюю стоимость всех заказов
+select avg(total_amount)
+from orders;
+-- Найти среднюю стоимость всех заказов по каждому клиенту
+select avg(o.total_amount), c.first_name, c.last_name
+from orders o
+         inner join customer c on o.customer_id = c.id
+group by c.id;
+-- Найти всех клиентов, которые живут в Бразилии или Испании
+select *
+from customer
+where country in ('Brazil', 'Spain');
+--Найти все заказы между 2013ым и 2014ым годами, которые стоили меньше 100.00$
+select *
+from orders
+where total_amount < 100
+  and order_date between '2013-01-01' and '2014-12-31';
+--Найти всех клиентов, которые в одной из стран: Испания, Италия, Германия, Франция. Отсортируйте по странам
+select *
+from customer
+where country in ('Brazil', 'Spain', 'France', 'Germany')
+order by country;
+--Найти все страны клиентов, страны которых содержаться в таблице поставщиков
+select distinct c.country
+from customer c
+         inner join supplier s on c.country = s.country;
+
+--Найти всех клиентов, имена которых начинаются на ‘Jo’
+select *
+from customer
+where first_name like 'Jo%';
+
+--Найти всех клиентов, имена которых заканчиваются на ‘a’ и имеют длину ровно 4 символа
+select *
+from customer
+where first_name like '____a';
+
+--Найти количество клиентов по странам
+select country, count(country)
+from customer
+group by country
+order by count(country) desc;
+
+--Найти общую сумму стоимости заказов и количество заказов по каждому клиенту (customer_id). Отсортировать по сумме
+select sum(o.total_amount), count(o.total_amount), c.first_name
+from orders o
+         inner join customer c on c.id = o.customer_id
+group by c.id
+order by sum(o.total_amount) desc;
+
+--Найти общую сумму стоимости заказов и количество заказов по каждому клиенту (customer_id), у которых общее количество заказов больше 20ти
+select sum(o.total_amount), count(o.total_amount)
+from orders o
+         inner join customer c on c.id = o.customer_id
+group by c.id
+having count(o.total_amount) > 20
+order by sum(o.total_amount) desc;
+
+-- Найти количество городов в каждой из стран клиентов
+select count(city), country
+from customer
+group by country;
+
+--order_item с id=5
+--- Выбрать:
+-- К какому заказу(номер заказа),
+-- Как зовут клиента,
+-- Из какого он города
+-- Наименование товара
+-- Цена товара
+-- Название поставщика
+
+select o.id,
+       concat(c.first_name, ' ', c.last_name) as customer,
+       c.country,
+       p.product_name,
+       p.unit_price,
+       s.company_name
+from order_item oi
+         inner join orders o on o.id = oi.order_id
+         inner join customer c on c.id = o.customer_id
+         inner join product p on oi.product_id = p.id
+         inner join supplier s on s.id = p.supplier_id
+where oi.id = 5;
+
+
+--Узнать есть ли поставщики без товара
+select *
+from supplier s
+         left join product p on s.id = p.supplier_id
+where p.id is null;
+
+
+--Выбрать только те товары которые были заказаны
+
+select p.id, p.product_name
+from orders o
+         inner join order_item oi on o.id = oi.order_id
+         inner join product p on p.id = oi.product_id;
+
+select count( distinct p.id)
+from orders o
+         inner join order_item oi on o.id = oi.order_id
+         inner join product p on p.id = oi.product_id;
+
+--Выбрать только те товары которые не были заказаны
+
+select count(p.id)
+from orders o
+         inner join order_item oi on o.id = oi.order_id
+         right join product p on p.id = oi.product_id
+where oi.product_id is null;
+
+
+select count(*) from product;
